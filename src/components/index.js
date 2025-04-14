@@ -11,7 +11,6 @@ export { default as Orders } from "./adminComponents/Orders";
 export { default as ViewProducts } from "./adminComponents/ViewProducts";
 export { default as AdminRoute } from "./adminRoute/AdminRoute";
 export { default as Breadcrumbs } from "./breadcrumbs/Breadcrumbs";
-export { default as Chart } from "./chart/chart";
 export { default as CheckoutForm } from "./checkoutForm/CheckoutForm";
 export { default as CheckoutSummary } from "./checkoutSummary/CheckoutSummary";
 export { default as Header } from "./header/Header";

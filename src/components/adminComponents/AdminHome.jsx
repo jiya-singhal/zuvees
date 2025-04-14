@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { InfoBox, Chart } from "../../components";
+import { InfoBox} from "../../components";
 import { BiRupee } from "react-icons/bi";
 import { FaCartArrowDown } from "react-icons/fa";
 import { BsCart } from "react-icons/bs";
@@ -32,9 +32,7 @@ const AdminHome = () => {
 				<InfoBox title={"Products"} count={products.length} icon={orderIcon} />
 				<InfoBox title={"Orders"} count={orderHistory.length} icon={productIcon} />
 			</section>
-			<div>
-				<Chart />
-			</div>
+			
 		</main>
 	);
 };

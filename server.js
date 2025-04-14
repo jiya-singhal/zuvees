@@ -9,14 +9,13 @@ if (process.env.NODE_ENV === "production") {
 		res.sendFile(path.resolve(__dirname, "build", "index.html"));
 	});
 }
-// This is your test secret API key.
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 
 app.use(express.json());
 app.use(cors());
 
 app.get("/", (req, res) => {
-	res.send("Welcome to Eshop");
+	res.send("Welcome to BreezyBuy");
 });
 
 const newArray = [];
@@ -31,33 +30,26 @@ const calculateOrderAmount = (items) => {
 };
 
 app.post("/create-payment-intent", async (req, res) => {
-	const { items, shippingAddress, description } = req.body;
-	console.log(shippingAddress);
-	// Create a PaymentIntent with the order amount and currency
-	const paymentIntent = await stripe.paymentIntents.create({
-		amount: calculateOrderAmount(items),
-		currency: "inr",
-		automatic_payment_methods: {
-			enabled: true,
-		},
-		description,
-		shipping: {
-			address: {
-				line1: shippingAddress.line1,
-				line2: shippingAddress.line2,
-				city: shippingAddress.city,
-				country: shippingAddress.country,
-				// pin_code: shippingAddress.pin_code,
-			},
-			name: shippingAddress.name,
-			phone: shippingAddress.phone,
-		},
+	const { items } = req.body;
+  
+	const calculateOrderAmount = (items) => {
+	  return items.reduce((total, item) => {
+		return total + item.price * item.qty;
+	  }, 0);
+	};
+  
+	const mockClientSecret = "mock_client_secret_" + Date.now();
+  
+	res.send({
+	  clientSecret: mockClientSecret,
+	  amount: calculateOrderAmount(items),
 	});
+  });
+  
 
 	res.send({
 		clientSecret: paymentIntent.client_secret,
 	});
-});
 
 const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => console.log(`Node server listening on port ${PORT}!`));

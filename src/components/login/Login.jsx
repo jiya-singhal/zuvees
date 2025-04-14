@@ -24,8 +24,8 @@ const Login = () => {
     // setInfoModalOpen(true);
     document.getElementById("my-modal-4").checked = false;
 
-    let testEmail = import.meta.env.VITE_TEST_EMAIL;
-    let testPass = import.meta.env.VITE_TEST_PASSWORD;
+    let testEmail = import.meta.env.TEST_EMAIL;
+    let testPass = import.meta.env.TEST_PASSWORD;
     setIsLoading(true);
     signInWithEmailAndPassword(auth, testEmail, testPass)
       .then((userCredential) => {

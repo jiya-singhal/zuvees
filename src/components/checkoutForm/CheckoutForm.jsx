@@ -1,44 +1,28 @@
-//CheckoutForm.jsx
-import React, { useEffect, useState } from "react";
-import {
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
-import CheckoutSummary from "../checkoutSummary/CheckoutSummary";
-import Breadcrumbs from "../breadcrumbs/Breadcrumbs";
-import Header from "../header/Header";
-import { toast } from "react-toastify";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// firebase
+import { toast } from "react-toastify";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
-import { db } from "../../firebase/config";
-//redux
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../../redux/slice/cartSlice";
-import Loader from "../loader/Loader";
+import { db } from "../../firebase/config";
+import CheckoutSummary from "../checkoutSummary/CheckoutSummary";
+import Header from "../header/Header";
 
 const CheckoutForm = () => {
-  const stripe = useStripe();
-  const elements = useElements();
-
-  const [message, setMessage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+
   const { email, userId } = useSelector((store) => store.auth);
   const { cartItems, totalAmount } = useSelector((store) => store.cart);
   const { shippingAddress } = useSelector((store) => store.checkout);
 
-  const saveOrder = () => {
-    const date = new Date().toDateString();
-    const time = new Date().toLocaleTimeString();
+  const saveOrder = async () => {
     const orderDetails = {
       userId,
       email,
-      orderDate: date,
-      orderTime: time,
+      orderDate: new Date().toDateString(),
+      orderTime: new Date().toLocaleTimeString(),
       orderAmount: totalAmount,
       orderStatus: "Order Placed",
       cartItems,
@@ -46,87 +30,41 @@ const CheckoutForm = () => {
       createdAt: Timestamp.now().toDate(),
     };
     try {
-      addDoc(collection(db, "orders"), orderDetails);
+      await addDoc(collection(db, "orders"), orderDetails);
       dispatch(clearCart());
+      toast.success("Order placed successfully!");
+      navigate("/checkout-success", { replace: true });
     } catch (error) {
-      toast.error(error.message);
+      toast.error("Failed to place order");
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleMockPayment = async (e) => {
     e.preventDefault();
-    setMessage(null);
-    if (!stripe || !elements) {
-      return;
-    }
     setIsLoading(true);
-    const confirmPayment = await stripe
-      .confirmPayment({
-        elements,
-        confirmParams: {
-          // Make sure to change this to your payment completion page
-          return_url: "http://localhost:5173/checkout-success",
-        },
-        redirect: "if_required",
-      })
-      .then((res) => {
-        if (res.error) {
-          setMessage(res.error.message);
-          toast.error(res.error.message);
-          return;
-        }
-        if (res.paymentIntent) {
-          if (res.paymentIntent.status === "succeeded") {
-            setIsLoading(false);
-            toast.success("Payment Successful");
-            saveOrder();
-            navigate("/checkout-success", { replace: true });
-          }
-        }
-      });
-    setIsLoading(false);
+    setTimeout(() => {
+      saveOrder();
+      setIsLoading(false);
+    }, 1500); // simulate network delay
   };
-
-  useEffect(() => {
-    if (!stripe) {
-      return;
-    }
-    const clientSecret = new URLSearchParams(window.location.search).get(
-      "payment_intent_client_secret"
-    );
-    if (!clientSecret) {
-      return;
-    }
-  }, [stripe]);
 
   return (
     <>
-      <Header text="Stripe Payment Gateway" />
+      <Header text="Mock Payment" />
       <section className="w-full mx-auto p-4 md:p-10 md:w-9/12 md:px-6 flex flex-col h-full">
         <div className="flex flex-col-reverse md:flex-row gap-4 justify-evenly">
           <div className="w-full md:w-2/5 h-max p-4 bg-base-100 rounded-md shadow-xl">
             <CheckoutSummary />
           </div>
           <div className="rounded-md shadow-xl pt-4 pb-8 px-10">
-            <h1 className="text-3xl font-light mb-2">Stripe Checkout</h1>
-            <form className="md:w-[30rem]" onSubmit={handleSubmit}>
-              <PaymentElement id="payment-element" />
+            <h1 className="text-3xl font-light mb-2">Complete Your Order</h1>
+            <form className="md:w-[30rem]" onSubmit={handleMockPayment}>
               <button
-                disabled={isLoading || !stripe || !elements}
-                id="submit"
-                className="btn bg-blue-600"
+                disabled={isLoading}
+                className="btn bg-blue-600 text-white px-6 py-2 mt-4"
               >
-                <span id="button-text">
-                  {isLoading ? (
-                    // <div className="spinner" id="spinner"></div>
-                    <Loader />
-                  ) : (
-                    "Pay now"
-                  )}
-                </span>
+                {isLoading ? "Processing..." : "Place Order"}
               </button>
-              {/* Show any error or success messages */}
-              {message && <div id="payment-message">{message}</div>}
             </form>
           </div>
         </div>
