@@ -61,12 +61,6 @@ const Contact = () => {
                      <CiPhone />
                      <a href="tel:+91-123-12345">91-123-12345</a>
                   </div>
-                  <div className="flex items-center gap-2 md:text-xl  my-2">
-                     <AiOutlineTwitter />
-                     <a href="https://twitter.com/kartik_im" rel="noreferrer" target="_blank">
-                        @Jiya_Singhal
-                     </a>
-                  </div>
                </div>
             </section>
             <section className="w-full md:w-2/3 rounded-md shadow-lg border-2 p-6">

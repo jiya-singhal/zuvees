@@ -161,10 +161,10 @@ const Login = () => {
                     <p className="py-4">
                       Still wanna test the app ? contact <br />
                       <a
-                        href="mailto: kartikpavan2@gmail.com"
+                        href="mailto: jiyasinghal95@gmail.com"
                         className="text-red-500 font-semibold"
                       >
-                        kartikpavan2@gmail.com
+                        jiyasinghal95@gmail.com
                       </a>
                     </p>
                   </label>
